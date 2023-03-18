@@ -1,24 +1,19 @@
 
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "AdptArray.h"
 
 
-typedef struct AdptArray_* PAdptArray;
-typedef enum  {FAIL = 0, SUCCESS=1} Result;
-typedef void* PElement;
 
-typedef void(*DEL_FUNC)(PElement);
-typedef PElement(*COPY_FUNC)(PElement);
-typedef void(*PRINT_FUNC)(PElement);
-
-
-typedef stuct AdptArray_ {
+typedef struct AdptArray_ {
 	int ArrSize;
 	PElement *pElement;
 	DEL_FUNC delFunc;
 	COPY_FUNC copyFunc;
 	PRINT_FUNC printFunc;
-} AdptArray, *PAdptArray
+} AdptArray, *PAdptArray;
+
 
 PAdptArray CreateAdptArray(COPY_FUNC copyF, DEL_FUNC delF,PRINT_FUNC printF){
     PAdptArray pArr = (PAdptArray)malloc(sizeof(AdptArray));
@@ -37,46 +32,52 @@ void DeleteAdptArray(PAdptArray pArr){
 	if (!pArr){
         return;
     }
-	for(int i = 0; i < pArr->ArrSize; i++){
-		pArr->delFunc((pArr->pElement)[i]);
+	for(int i = 0; i < pArr->ArrSize; ++i){
+		if ((pArr->pElement)[i] != NULL)
+			pArr->delFunc((pArr->pElement)[i]);
 	}
 	free(pArr->pElement);
 	free(pArr);
-
 }
 
 Result SetAdptArrayAt(PAdptArray pArr, int index, PElement pElem){
+
+	PElement* elementCopy;
 	if (!pArr){
 		return FAIL;
 	}
 
-	PElement *elementCopy;
 	// if the given index if larger than the array's size we'll have to extend it (possible as dynamic)
 	if (index >= pArr -> ArrSize){
 		//Note that we're using calloc so values are not initialized to random values as malloc would do.
-		elementCopy = (PElement*)calloc((index+1),sizeof(Element));
+		elementCopy = (PElement*)calloc((index+1),sizeof(PElement));
 		if (!elementCopy){
 			return FAIL;
 		}
 		//Copies the element and saves it so it can be added back later
-		memcpy(elementCopy, pArr -> pElement , (pArr -> ArrSize) * sizeof(PElement));
+		memcpy(elementCopy, pArr -> pElement , (pArr -> ArrSize)*sizeof(PElement));
 		//frees the old element
 		free (pArr ->pElement);
 		pArr -> pElement = elementCopy;
 	}
-
-	pArr-> delFunc((pArr -> pElement)[index]);
-	(pArr -> pElement)[index] = pArr -> copyFunc(elementCopy);
+	if ((pArr -> pElement)[index] != NULL){
+		pArr-> delFunc((pArr -> pElement)[index]);
+	}
+	(pArr -> pElement)[index] = pArr -> copyFunc(pElem);
 
 	//Update the size of the final array if needed
 	if (pArr -> ArrSize <= index){
 		pArr -> ArrSize = index+1;
 	}
+	
 	return SUCCESS;
 }
 
-PElement GetAdptArrayAt(PAdptArray, int){
-	
+PElement GetAdptArrayAt(PAdptArray pArr, int index){
+	if (!(pArr -> pElement[index]) || index >= pArr ->ArrSize){
+		return NULL;
+	}
+	return pArr-> copyFunc((pArr -> pElement)[index]);
 }
 
 int GetAdptArraySize(PAdptArray pArr){
