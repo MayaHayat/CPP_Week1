@@ -15,34 +15,67 @@
 
 int main() {
 
-	pbook b1 = creat_book("harry Potter",12345) ;
-	pbook b2= creat_book("C intro", 45678) ;
+	pbook bookA = creat_book("The Hunger Games",2008);
+	pbook bookB= creat_book("1984",1949);
+	pbook bookC= creat_book("Mecbeth",1623) ;
+
 	PAdptArray mybooks = CreateAdptArray(copy_book,delete_book,print_book);
-	SetAdptArrayAt(mybooks,3,b1);
-	SetAdptArrayAt(mybooks,5,b2);
-	printf("the size is %d\n",GetAdptArraySize(mybooks));  //should print 6
-	pbook b = GetAdptArrayAt(mybooks,4); // should return null;
-	assert(b==NULL); // doesn't fail
-	b = GetAdptArrayAt(mybooks,3);
-	printf("the book is %s\n",b->name); //should print "Harry Potter"
+	SetAdptArrayAt(mybooks,3,bookA);
+	SetAdptArrayAt(mybooks,5,bookB);
+	SetAdptArrayAt(mybooks,9,bookC);
+
+	printf("\nthe size is %d\n",GetAdptArraySize(mybooks)); 
+	pbook check = GetAdptArrayAt(mybooks,4); 
+	assert(check==NULL);
+
+	check = GetAdptArrayAt(mybooks,3);
+	printf("the name of the book in the third place is: %s\n",check->name); 
+	assert(check->serial_number == 2008);
+
+	check = GetAdptArrayAt(mybooks,9);
+	printf("the year of publication of the book in the ninth place is: %d\n",check->serial_number); 
+
+	assert(check->serial_number == 1623);
+
+	printf("\n------Trying out the PRINTDB function-----\n");
 	PrintDB(mybooks);
 
-	pperson p1 = creat_person("Harry","Potter", 934);
-	pperson p2 = creat_person("Ron","Weasley", 789);
-	PAdptArray HP_caracters = CreateAdptArray(copy_person,delete_person,print_person);
-	SetAdptArrayAt(HP_caracters,2,p1);
-	SetAdptArrayAt(HP_caracters,8,p2);
-	printf("the size is %d\n",GetAdptArraySize(HP_caracters)); // prints 9
-	PrintDB(HP_caracters); // prints:
-	//first name: Harry last name: Potter id: 934
-        //first name: Ron last name: Weasley id: 789
-	
+	printf("\n");
+
+	pperson personA = creat_person("Bruce","Banner", 1050);
+	pperson personB = creat_person("Peter","Parker", 73451);
+	pperson personC = creat_person("Bruce","Wayne", 1234567);
+
+	PAdptArray SuperHeros = CreateAdptArray(copy_person,delete_person,print_person);
+	SetAdptArrayAt(SuperHeros,1,personA);
+	SetAdptArrayAt(SuperHeros,2,personB);
+	SetAdptArrayAt(SuperHeros,12,personC);
+	SetAdptArrayAt(SuperHeros,15,personC); // entring the same book twice
+
+	pperson check2 = GetAdptArrayAt(SuperHeros,1);
+	assert(check2->id == 1050);
+
+	printf("\nthe size is %d\n",GetAdptArraySize(SuperHeros)); // prints 9
+
+
+	printf("\n------Trying out the PRINTDB function-----\n");
+	PrintDB(SuperHeros); 
+
+
+
+// ----------- freeing space at least --  checked using the make tidy at the end!
 	DeleteAdptArray(mybooks);
-	DeleteAdptArray(HP_caracters);
-	delete_book(b1);
-	delete_book(b2);
-	delete_book(b);
-	delete_person(p1);
-	delete_person(p2);
+	DeleteAdptArray(SuperHeros);
+	delete_book(bookA);
+	delete_book(bookB);
+	delete_book(bookC);
+
+	delete_book(check);
+	delete_person(personA);
+	delete_person(personB);
+	delete_person(personC);
+	
 	return 0;
+
+	
 }
